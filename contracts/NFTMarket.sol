@@ -85,7 +85,7 @@ contract NFTMarket is ReentrancyGuard {
     ) public payable nonReentrant {
         uint price = idToMarketItem[itemId].price;
         uint tokenId = idToMarketItem[itemId].tokenId;
-        require(msg.value == listingPrice, "Price submit the asking price in order to complete the purchhase");
+        require(msg.value >= listingPrice, "Price submit the asking price in order to complete the purchase");
 
         idToMarketItem[itemId].seller.transfer(msg.value); // send funds to the seller
         IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId); // send asset to the new owner
@@ -95,13 +95,21 @@ contract NFTMarket is ReentrancyGuard {
         payable(owner).transfer(listingPrice); // transfer fee to market owner
     }
 
-    // function fetchMarketItems() public view returns (MarketItem[] memory) {
-    //     uint itemCount = _itemIds.current();
-    //     uint unsoldItemCount = _itemIds.current() - _itemSold.current();
-    //     uint currentIndex = 0;
+    function fetchMarketItems() public view returns (MarketItem[] memory) {
+        uint itemCount = _itemIds.current();
+        uint unsoldItemCount = _itemIds.current() - _itemSold.current();
+        uint currentIndex = 0;
 
-    //     MarketItem[] memory items = new MarketItem[](unsoldItemCount);
-
-    // }
+        MarketItem[] memory items = new MarketItem[](unsoldItemCount);
+        for (uint i = 0; i < itemCount; i++) {
+            if (idToMarketItem[i + 1].owner == address(0)) {
+                uint currentId = i + 1;
+                MarketItem storage currentItem = idToMarketItem[currentId];
+                items[currentIndex] = currentItem;
+                currentIndex += 1;
+            }
+        }
+        return items;
+    }
 
 }
