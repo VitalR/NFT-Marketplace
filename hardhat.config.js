@@ -1,37 +1,45 @@
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-etherscan");
 require("dotenv").config();
+require("hardhat-gas-reporter");
 
-const {PRIVAT_KEY, INFURA_PROJECT_ID, POLYGON_API_KEY} = process.env;
+const {PRIVATE_KEY, BSCSCAN_API_KEY, INFURA_PROJECT, ETHERSCAN_API_KEY} = process.env;
 
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
 
-  for (const account of accounts) {
-    console.log(account.address);
-  }
-});
-
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
-
-/**
- * @type import('hardhat/config').HardhatUserConfig
- */
 module.exports = {
   networks: {
-    hardhat: {
-      chainId: 1337
+    bscTestnet: {
+      url: `https://data-seed-prebsc-1-s1.binance.org:8545`,
+      accounts: [PRIVATE_KEY]
     },
-    mumbai: {
-      url: `https://polygon-mumbai.infura.io/v3/${INFURA_PROJECT_ID}`,
-      accounts: [PRIVAT_KEY]
+    bscMainnet: {
+      url: `https://bsc-dataseed1.ninicoin.io`,
+      accounts: [PRIVATE_KEY]
     },
-    mainnet: {
-      url: `https://polygon-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
-      accounts: [PRIVAT_KEY]
+    rinkeby: {
+      url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT}`,
+      accounts: [PRIVATE_KEY]
+    },
+  },
+  solidity: {
+    version: "0.8.3",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 400
+      }
     }
   },
-  solidity: "0.8.4",
+  defaultNetwork: "hardhat",
+  gasPrice: "70000000000",
+  gas: "auto",
+  gasReporter: {
+    gasPrice: 1,
+    enabled: false,
+    showTimeSpent: true
+  },
+  etherscan: {
+    apiKey: BSCSCAN_API_KEY
+  }
 };
+
