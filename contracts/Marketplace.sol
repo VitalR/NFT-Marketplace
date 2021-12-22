@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 
-contract NFTMarket is ReentrancyGuard, Ownable {
+contract Marketplace is ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
     using Counters for Counters.Counter;
     Counters.Counter private _itemIds;
@@ -81,7 +81,7 @@ contract NFTMarket is ReentrancyGuard, Ownable {
  
     function updateItemPrice(uint256 _itemId, uint256 _newPriceART, uint256 _newPriceBNB) external {
         address tokenSeller = tokenIdToMarketItem[_itemId].seller;
-        require(msg.sender == tokenSeller, "DSMarket: should be token seller");
+        require(msg.sender == tokenSeller, "Market: should be token seller");
         MarketItem storage item = tokenIdToMarketItem[_itemId];
         item.priceART = _newPriceART;
         item.priceBNB = _newPriceBNB;
@@ -112,18 +112,18 @@ contract NFTMarket is ReentrancyGuard, Ownable {
     ) external nonReentrant {
         require(
             IERC165(_tokenContract).supportsInterface(INTERFACE_ID_ERC721),
-            "DSMarket: token contract does not support ERC721 interface"
+            "Market: token contract does not support ERC721 interface"
         );
         require(
             msg.sender == IERC721(_tokenContract).ownerOf(_tokenId) ||
             msg.sender == IERC721(_tokenContract).getApproved(_tokenId), 
-            "DSMarket: should be the token owner or approved"
+            "Market: should be the token owner or approved"
         );
         require(
             IERC721(_tokenContract).getApproved(_tokenId) == address(this), 
-            "DSMarket: marketplace should be approved for transferring NFT token"
+            "Market: marketplace should be approved for transferring NFT token"
         );
-        require(_priceART > 0 || _priceBNB > 0, "DSMarket: price must be greater than zero");
+        require(_priceART > 0 || _priceBNB > 0, "Market: price must be greater than zero");
 
         _itemIds.increment();
         uint256 _itemId = _itemIds.current();
@@ -175,9 +175,9 @@ contract NFTMarket is ReentrancyGuard, Ownable {
 
         if (_amount != 0) {
         // if (IERC20(_paymentToken) == payToken) {
-            require(priceART != 0, "DSMarket: market token price can not be zero");
-            require(_amount >= priceART, "DSMarket: please submit the asking price in order to complete the purchase");
-            require(IERC20(payToken).allowance(msg.sender, address(this)) == _amount, "DSMarket: marketplace should be approved as a spender");
+            require(priceART != 0, "Market: market token price can not be zero");
+            require(_amount >= priceART, "Market: please submit the asking price in order to complete the purchase");
+            require(IERC20(payToken).allowance(msg.sender, address(this)) == _amount, "Market: marketplace should be approved as a spender");
             
             if (platformFee > 0) {
                 feeAmount = _platformPayment(priceART);
@@ -203,8 +203,8 @@ contract NFTMarket is ReentrancyGuard, Ownable {
         } 
         else if (_amount == 0) {
         // else if (_paymentToken == address(0)) {
-            require(priceBNB != 0, "DSMarket: market token price can not be zero");
-            require(msg.value >= priceBNB, "DSMarket: please submit the asking price in order to complete the purchase");
+            require(priceBNB != 0, "Market: market token price can not be zero");
+            require(msg.value >= priceBNB, "Market: please submit the asking price in order to complete the purchase");
 
             if (platformFee > 0) {
                 feeAmount = _platformPayment(priceBNB);
@@ -229,7 +229,7 @@ contract NFTMarket is ReentrancyGuard, Ownable {
             );
         }
         else {
-            revert("DSMarket: not supported payment token");
+            revert("Market: not supported payment token");
         }
     }
 
@@ -238,14 +238,14 @@ contract NFTMarket is ReentrancyGuard, Ownable {
         address marketItemCreator = tokenIdToMarketItem[_itemId].seller;
         uint256 tokenId = tokenIdToMarketItem[_itemId].tokenId;
         bool unsold = tokenIdToMarketItem[_itemId].sold;
-        require(unsold == false, "DSMarket: market item is already sold");
+        require(unsold == false, "Market: market item is already sold");
 
         if (msg.sender == marketItemCreator) {
             IERC721(tokenContract).safeTransferFrom(address(this), msg.sender, tokenId);
         } else if (msg.sender == owner()) {
             IERC721(tokenContract).safeTransferFrom(address(this), marketItemCreator, tokenId);
         } else {
-            revert("DSMarket: market item can be cancelled by token seller or admin");
+            revert("Market: market item can be cancelled by token seller or admin");
         }
 
         emit MarketItemCanceled(_itemId, tokenId, marketItemCreator);

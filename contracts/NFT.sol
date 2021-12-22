@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 
-contract NFT is ERC721URIStorage, Ownable {
+contract EventNFT is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     address contractAddress;
@@ -56,7 +56,7 @@ contract NFT is ERC721URIStorage, Ownable {
         string memory _showTime,
         string memory _showVenue,
         string memory _showLocation
-    ) ERC721("First Live NFT Show", "NFT") {
+    ) ERC721("NFT-Ticket to World's 1st Live NFT Experience", "NFT") {
         contractAddress = _marketplaceAddress;
         ticketId = _ticketId;
         mintingDate = _mintingDate;

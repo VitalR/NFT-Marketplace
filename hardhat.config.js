@@ -8,14 +8,14 @@ const {PRIVATE_KEY, BSCSCAN_API_KEY, INFURA_PROJECT, ETHERSCAN_API_KEY} = proces
 
 module.exports = {
   networks: {
-    bscTestnet: {
-      url: `https://data-seed-prebsc-1-s1.binance.org:8545`,
-      accounts: [PRIVATE_KEY]
-    },
-    bscMainnet: {
-      url: `https://bsc-dataseed1.ninicoin.io`,
-      accounts: [PRIVATE_KEY]
-    },
+    // bscTestnet: {
+    //   url: `https://data-seed-prebsc-1-s1.binance.org:8545`,
+    //   accounts: [PRIVATE_KEY]
+    // },
+    // bscMainnet: {
+    //   url: `https://bsc-dataseed1.ninicoin.io`,
+    //   accounts: [PRIVATE_KEY]
+    // },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT}`,
       accounts: [PRIVATE_KEY]
