@@ -100,11 +100,11 @@ contract EventNFT is ERC721URIStorage, Ownable {
             _mint(recipient, newItemId);
             // Set tokenURI for minted token
             _setTokenURI(newItemId, tokenURI[i]);
-            // Set approve for Market contract
-            setApprovalForAll(contractAddress, true);
             // Create event
             emit TokenCreated(newItemId, recipient, class, initialPrice);
         }
+        // Set approve for Market contract
+        setApprovalForAll(contractAddress, true);
     }
 
     function getTicket(uint256 tokenId) public view returns (
