@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 
-contract DSMerchNFT is ERC721URIStorage, ReentrancyGuard, Ownable {
+contract MerchNFT is ERC721URIStorage, ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
