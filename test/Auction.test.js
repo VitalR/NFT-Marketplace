@@ -4,7 +4,7 @@ const { expectRevert } = require('@openzeppelin/test-helpers');
 const ether = require("@openzeppelin/test-helpers/src/ether");
 const { ethers } = require("hardhat");
 
-describe("DSAuction", function () {
+describe("Auction", function () {
 
     let marketContract, marketAddress
     let DBZContract, DBZContractAddress
@@ -18,7 +18,7 @@ describe("DSAuction", function () {
         [NFTContractOwner, buyerAddress, buyerAddress2, _] = await ethers.getSigners()
         
         const MintableERC20 = await ethers.getContractFactory("MintableERC20")
-        DBZContract = await MintableERC20.deploy("DBZ", "DBZ")
+        DBZContract = await MintableERC20.deploy("ART", "ART")
         await DBZContract.deployed()
         DBZContractAddress = DBZContract.address
 
@@ -26,18 +26,18 @@ describe("DSAuction", function () {
         DBZContract.connect(buyerAddress).mint(DBZamountToMint)
         DBZContract.connect(buyerAddress2).mint(DBZamountToMint)
 
-        const MarketContract = await ethers.getContractFactory("DSMarket")
+        const MarketContract = await ethers.getContractFactory("Market")
         marketContract = await MarketContract.deploy(NFTContractOwner.address)
         await marketContract.deployed()
         marketContract.setPaymentToken(DBZContractAddress)
         marketAddress = marketContract.address
 
-        const NFT = await ethers.getContractFactory("DSNFT")
+        const NFT = await ethers.getContractFactory("NFT")
         NFTContract = await NFT.deploy(marketAddress, NFTContractOwner.address, "1", "20210917", "First Amazing Show", "Kendrick Lamar", "20210925", "20:00", "Big Plaza", "10 E 20 N, Hugeston, TX");
         await NFTContract.deployed()
         NFTContractAddress = NFTContract.address
 
-        const AuctionContract = await ethers.getContractFactory("DSAuction")
+        const AuctionContract = await ethers.getContractFactory("Auction")
         auctionContract = await AuctionContract.deploy()
         await auctionContract.deployed()
         DSAuctionContractAddress = auctionContract.address 
