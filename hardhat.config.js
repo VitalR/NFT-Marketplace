@@ -3,7 +3,7 @@ require("@nomiclabs/hardhat-etherscan");
 require("dotenv").config();
 require("hardhat-gas-reporter");
 
-const {PRIVATE_KEY, BSCSCAN_API_KEY, INFURA_PROJECT, ETHERSCAN_API_KEY} = process.env;
+const {PRIVATE_KEY, BSCSCAN_API_KEY, INFURA_PROJECT_ID, ETHERSCAN_API_KEY} = process.env;
 
 
 module.exports = {
@@ -17,7 +17,7 @@ module.exports = {
     //   accounts: [PRIVATE_KEY]
     // },
     rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT}`,
+      url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
       accounts: [PRIVATE_KEY]
     },
   },
@@ -39,7 +39,7 @@ module.exports = {
     showTimeSpent: true
   },
   etherscan: {
-    apiKey: BSCSCAN_API_KEY
+    apiKey: ETHERSCAN_API_KEY
   }
 };
 
