@@ -7,29 +7,29 @@ const { ethers } = require("hardhat");
 describe("Auction", function () {
 
     let marketContract, marketAddress
-    let DBZContract, DBZContractAddress
+    let payTokenContract, payTokenContractAddress
     let NFTContract, NFTContractAddress
 
     const baseUnit = 18
-    const DBZamountToMint = utils.parseUnits('500000', baseUnit)
-    const DBZamount = utils.parseUnits('1000', baseUnit)
+    const payTokenAmountToMint = utils.parseUnits('500000', baseUnit)
+    const amount = utils.parseUnits('1000', baseUnit)
 
     before(async () => {
         [NFTContractOwner, buyerAddress, buyerAddress2, _] = await ethers.getSigners()
         
         const MintableERC20 = await ethers.getContractFactory("MintableERC20")
-        DBZContract = await MintableERC20.deploy("ART", "ART")
-        await DBZContract.deployed()
-        DBZContractAddress = DBZContract.address
+        payTokenContract = await MintableERC20.deploy("ART", "ART")
+        await payTokenContract.deployed()
+        payTokenContractAddress = payTokenContract.address
 
-        DBZContract.mint(DBZamountToMint)
-        DBZContract.connect(buyerAddress).mint(DBZamountToMint)
-        DBZContract.connect(buyerAddress2).mint(DBZamountToMint)
+        payTokenContract.mint(payTokenAmountToMint)
+        payTokenContract.connect(buyerAddress).mint(payTokenAmountToMint)
+        payTokenContract.connect(buyerAddress2).mint(payTokenAmountToMint)
 
         const MarketContract = await ethers.getContractFactory("Market")
         marketContract = await MarketContract.deploy(NFTContractOwner.address)
         await marketContract.deployed()
-        marketContract.setPaymentToken(DBZContractAddress)
+        marketContract.setPaymentToken(payTokenContract.addres)
         marketAddress = marketContract.address
 
         const NFT = await ethers.getContractFactory("NFT")
@@ -40,8 +40,8 @@ describe("Auction", function () {
         const AuctionContract = await ethers.getContractFactory("Auction")
         auctionContract = await AuctionContract.deploy()
         await auctionContract.deployed()
-        DSAuctionContractAddress = auctionContract.address 
-        auctionContract.setPaymentToken(DBZContractAddress)
+        AuctionContractAddress = auctionContract.address 
+        auctionContract.setPaymentToken(payTokenContract.address)
     })
 
     it('Should be deployed successfully', async () => {
@@ -49,7 +49,7 @@ describe("Auction", function () {
         expect(marketAddress).to.not.equal('');
         expect(marketAddress).to.not.equal(null);
         expect(marketAddress).to.not.equal(undefined);
-        expect(await DBZContract.balanceOf(buyerAddress.address)).to.equal(DBZamountToMint)
+        expect(await payTokenContract.balanceOf(buyerAddress.address)).to.equal(payTokenAmountToMint)
     })
 
     it('Should be possible to create NFT', async () => {
@@ -58,16 +58,16 @@ describe("Auction", function () {
      })
 
     //  it('Should create Market item', async () => {
-    //     await marketContract.createMarketItem(NFTContractAddress, 1, DBZamount)
-    //     await DBZContract.connect(buyerAddress).approve(marketContract.address, DBZamount)
+    //     await marketContract.createMarketItem(NFTContractAddress, 1, amount)
+    //     await payTokenContract.connect(buyerAddress).approve(marketContract.address, amount)
     //  })
 
     // it('Should execute market sale', async () => {
 
-    //     await marketContract.connect(buyerAddress).createMarketSale(DBZContractAddress, NFTContractAddress, 1, { value: DBZamount })
+    //     await marketContract.connect(buyerAddress).createMarketSale(payTokenContractAddress, NFTContractAddress, 1, { value: amount })
     //     expect((await NFTContract.ownerOf(1)).toString()).to.equal(buyerAddress.address);
-    //     expect((await DBZContract.balanceOf(NFTContractOwner.address)).toString()).to.equal(DBZamount.toString());
-    //     expect((await DBZContract.balanceOf(buyerAddress.address)).toString()).to.equal((DBZamountToMint-DBZamount).toString());
+    //     expect((await payTokenContract.balanceOf(NFTContractOwner.address)).toString()).to.equal(amount.toString());
+    //     expect((await payTokenContract.balanceOf(buyerAddress.address)).toString()).to.equal((payTokenAmountToMint-amount).toString());
         
     //     // check flag of market item sold=true when item sold
     //     const items = await marketContract.fetchItemsCreated()
@@ -80,7 +80,7 @@ describe("Auction", function () {
         const bidIncrement = utils.parseUnits('50', baseUnit)
 
         await NFTContract.approve(auctionContract.address, tokenId)
-        await auctionContract.createAuction(NFTContractAddress, tokenId, DBZamount, duration, bidIncrement)
+        await auctionContract.createAuction(NFTContractAddress, tokenId, amount, duration, bidIncrement)
 
         const auction = await auctionContract.getAuction(0)
         console.log(auction.nftContract)
@@ -89,14 +89,14 @@ describe("Auction", function () {
         expect(auction.nftContract).to.equal(NFTContractAddress)
         expect(auction.tokenId).to.equal(tokenId)
         expect(auction.seller).to.equal(NFTContractOwner.address)
-        expect(auction.price).to.equal(DBZamount)
+        expect(auction.price).to.equal(amount)
         expect(auction.duration).to.equal(duration)
         expect(auction.bidIncrement).to.equal(bidIncrement)
     })
 
     it('Should be possible to place bid', async () => {
         const auctionId = 0
-        console.log((await DBZContract.balanceOf(auctionContract.address)).toString())
+        console.log((await payTokenContract.balanceOf(auctionContract.address)).toString())
         console.log((await ethers.provider.getBalance(auctionContract.address)).toString())
 
         let auctionBeforeBid = await auctionContract.getAuction(auctionId)
@@ -107,13 +107,13 @@ describe("Auction", function () {
         const bid_1 = utils.parseUnits('1100', baseUnit)
         const bid_2 = utils.parseUnits('1200', baseUnit)
         // let bid = 600
-        await DBZContract.approve(auctionContract.address, bid_1)
-        await DBZContract.connect(buyerAddress).approve(auctionContract.address, bid_2)
+        await payTokenContract.approve(auctionContract.address, bid_1)
+        await payTokenContract.connect(buyerAddress).approve(auctionContract.address, bid_2)
 
         await auctionContract.connect(buyerAddress).placeBid(auctionId, bid_1)
 
         // const bid_2 = utils.parseUnits('1200', baseUnit)
-        // await DBZContract.connect(buyerAddress2).approve(auctionContract.address, bid_2)
+        // await payTokenContract.connect(buyerAddress2).approve(auctionContract.address, bid_2)
         // await auctionContract.connect(buyerAddress2).placeBid(auctionId, bid_2)
 
         let auctionAfterBid = await auctionContract.getAuction(auctionId)
@@ -133,10 +133,10 @@ describe("Auction", function () {
 
         // const bid = utils.parseUnits('20000', baseUnit)
 
-        // await DBZContract.approve(auctionContract.address, bid)
-        // await DBZContract.connect(buyerAddress).approve(auctionContract.address, bid)
+        // await payTokenContract.approve(auctionContract.address, bid)
+        // await payTokenContract.connect(buyerAddress).approve(auctionContract.address, bid)
 
-        console.log("allowance ", (await DBZContract.connect(buyerAddress).allowance(buyerAddress.address, auctionContract.address)).toString())
+        console.log("allowance ", (await payTokenContract.connect(buyerAddress).allowance(buyerAddress.address, auctionContract.address)).toString())
 
         function wait(ms){
             var start = new Date().getTime();

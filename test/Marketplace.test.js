@@ -24,7 +24,7 @@ describe("Marketplace", function () {
     const ticketClass = "VIP"
     const tokenURI = ["https://gateway.pinata.cloud/ipfs/QmSiHtv8WofyNTHWcTj5P28ccQk4N3uSn6V84RY7oQobCH"]
 
-    const DBZamountToMint = utils.parseUnits('500000', baseUnit)
+    const payTokenAmountToMint = utils.parseUnits('500000', baseUnit)
     const initialPrice = utils.parseUnits('900', baseUnit)
     const amount = utils.parseUnits('1000', baseUnit)
 
@@ -35,9 +35,9 @@ describe("Marketplace", function () {
         payTokenContract = await MintableERC20.deploy("ART", "ART")
         await payTokenContract.deployed()
 
-        // payTokenContract.mint(DBZamountToMint)
-        payTokenContract.connect(user).mint(DBZamountToMint)
-        payTokenContract.connect(userTwo).mint(DBZamountToMint)
+        // payTokenContract.mint(payTokenAmountToMint)
+        payTokenContract.connect(user).mint(payTokenAmountToMint)
+        payTokenContract.connect(userTwo).mint(payTokenAmountToMint)
 
         const MarketContract = await ethers.getContractFactory("Marketplace")
         marketContract = await MarketContract.deploy()
@@ -61,8 +61,8 @@ describe("Marketplace", function () {
         expect(marketContract).to.not.equal('');
         expect(marketContract).to.not.equal(null);
         expect(marketContract).to.not.equal(undefined);
-        expect(await payTokenContract.balanceOf(user.address)).to.equal(DBZamountToMint)
-        expect(await payTokenContract.balanceOf(userTwo.address)).to.equal(DBZamountToMint)
+        expect(await payTokenContract.balanceOf(user.address)).to.equal(payTokenAmountToMint)
+        expect(await payTokenContract.balanceOf(userTwo.address)).to.equal(payTokenAmountToMint)
     })
 
     // it('Should be possible to create NFT', async () => {
